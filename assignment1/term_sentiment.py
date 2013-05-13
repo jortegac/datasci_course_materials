@@ -28,6 +28,9 @@ def process_tweets(tweet_file):
 #Based on the sentiment dictionary and list of tweets, calculate the sentiment of unknown words
 def calculate_score_unknown_words(sentiments, tweets):
 
+	pos_words = {}
+	all_unknowns = set()
+	
 	#Iterate through all the tweets
 	for tweet in tweets:
 		words = tweet.split()
@@ -38,11 +41,11 @@ def calculate_score_unknown_words(sentiments, tweets):
 		#Number of words in the tweet
 		num = len(words)
 		
-		positive = 1
-		negative = 1
-		
 		#Unknown words in the tweet
 		unknown = []
+		
+		positive = 0.0
+		negative = 0.0
 		
 		#Iterate through every word in the tweet
 		for word in words:		
@@ -51,22 +54,28 @@ def calculate_score_unknown_words(sentiments, tweets):
 				score = float(sentiments[word])
 				#If score is positive
 				if score > float(0):
-					positive += 1
+					positive += 1.0
 				#If score is negative
 				elif score < float(0):
-					negative += 1
+					negative += 1.0
 				
 			except (NameError, TypeError, KeyError):
 				#If the word is not in the sentiment dictionary
 				unknown.append(word)
+				all_unknowns.add(word)
 				pass
-		
-		#Score for unknown words in the tweet
-		calculated_score = float(positive/negative)
-		
-		#Print the score of every unknown word in the tweet
+				
 		for word in unknown:
-			print word + " " + str(calculated_score)
+			if negative > 0.0:
+				score = float(positive/negative)
+			else:
+				score = 0.0
+				
+			pos_words[word] = pos_words.get(word, 0.0) + score
+				
+	#Print the score of every unknown word in the tweet
+	for word in all_unknowns:
+		print word + " " + str(pos_words.get(word))
 
 def hw(sent_file, tweet_file):
 	sentiments = process_sentiment(sent_file)
