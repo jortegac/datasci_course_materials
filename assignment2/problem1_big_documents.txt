@@ -1,0 +1,4 @@
+SELECT count(doc) 
+	FROM (SELECT docid doc, SUM(count) sum FROM frequency 
+	GROUP BY docid) 
+	WHERE sum > 300;
